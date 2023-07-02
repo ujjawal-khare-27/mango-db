@@ -5,18 +5,64 @@ package main
 
 import "os"
 
-// function to open a file
-func OpenFile(path string) (*os.File, error) {
-	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0755)
+type pgnum uint64
+
+type page struct {
+	num  pgnum
+	data []byte
+}
+
+type dal struct {
+	file     *os.File
+	pageSize int
+}
+
+// function to create a new data access layer
+func newDAL(path string, pageSize int) (*dal, error) {
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0755)
 	if err != nil {
 		return nil, err
 	}
-	return f, nil
+	return &dal{file: file, pageSize: pageSize}, nil
 }
 
 // function to close a file
-func CloseFile(f *os.File) error {
-	err := f.Close()
+func (d *dal) close() error {
+	err := d.file.Close()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// allocate a empty page for reading & writing data
+func (d *dal) allocateEmptyPage() *page {
+	return &page{
+		data: make([]byte, d.pageSize),
+	}
+}
+
+// read a page from the file
+func (d *dal) readPage(pageNum pgnum) (*page, error) {
+	p := d.allocateEmptyPage()
+
+	// correct offset calculation is performed
+	// using the page number and page size
+	offset := int(pageNum) * d.pageSize
+
+	// Then we read the data at the correct offset
+	_, err := d.file.ReadAt(p.data, int64(offset))
+	if err != nil {
+		return nil, err
+	}
+	return p, err
+}
+
+// write a page to the file
+func (d *dal) writePage(p *page) error {
+	offset := int(p.num) * d.pageSize
+
+	_, err := d.file.WriteAt(p.data, int64(offset))
 	if err != nil {
 		return err
 	}
