@@ -1,3 +1,8 @@
+/*
+freelist implements a freelist for pages.
+This is used to handle the allocation and release of pages.
+If there are no released pages available, a new page is allocated.
+*/
 package main
 
 const initialPage = 0
