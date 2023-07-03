@@ -15,6 +15,7 @@ type page struct {
 type dataAccessLayer struct {
 	file     *os.File
 	pageSize int
+	freelist *freelist
 }
 
 // function to create a new data access layer
@@ -23,7 +24,7 @@ func newDataAccessLayer(path string, pageSize int) (*dataAccessLayer, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &dataAccessLayer{file: file, pageSize: pageSize}, nil
+	return &dataAccessLayer{file: file, pageSize: pageSize, freelist: newFreelist()}, nil
 }
 
 // function to close a file
