@@ -12,22 +12,22 @@ type page struct {
 	data []byte
 }
 
-type dal struct {
+type dataAccessLayer struct {
 	file     *os.File
 	pageSize int
 }
 
 // function to create a new data access layer
-func newDAL(path string, pageSize int) (*dal, error) {
+func newDataAccessLayer(path string, pageSize int) (*dataAccessLayer, error) {
 	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0755)
 	if err != nil {
 		return nil, err
 	}
-	return &dal{file: file, pageSize: pageSize}, nil
+	return &dataAccessLayer{file: file, pageSize: pageSize}, nil
 }
 
 // function to close a file
-func (d *dal) close() error {
+func (d *dataAccessLayer) close() error {
 	err := d.file.Close()
 	if err != nil {
 		return err
@@ -36,14 +36,14 @@ func (d *dal) close() error {
 }
 
 // allocate a empty page for reading & writing data
-func (d *dal) allocateEmptyPage() *page {
+func (d *dataAccessLayer) allocateEmptyPage() *page {
 	return &page{
 		data: make([]byte, d.pageSize),
 	}
 }
 
 // read a page from the file
-func (d *dal) readPage(pageNum pgnum) (*page, error) {
+func (d *dataAccessLayer) readPage(pageNum pgnum) (*page, error) {
 	p := d.allocateEmptyPage()
 
 	// correct offset calculation is performed
@@ -59,7 +59,7 @@ func (d *dal) readPage(pageNum pgnum) (*page, error) {
 }
 
 // write a page to the file
-func (d *dal) writePage(p *page) error {
+func (d *dataAccessLayer) writePage(p *page) error {
 	offset := int(p.num) * d.pageSize
 
 	_, err := d.file.WriteAt(p.data, int64(offset))
