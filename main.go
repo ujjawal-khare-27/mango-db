@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 type Document struct {
 	ID   string                 `json:"id""`
@@ -42,4 +45,17 @@ func (ds *DocumentStore) Update(document Document) error {
 
 	ds.documents[document.ID] = document
 	return nil
+}
+
+func main() {
+	// initialize db
+	dataAccessLayer, _ := newDataAccessLayer("db.db", os.Getpagesize())
+
+	// create a new page
+	p := dataAccessLayer.allocateEmptyPage()
+	p.num = dataAccessLayer.getNextPage()
+	copy(p.data[:], "data")
+
+	// commit it
+	_ = dataAccessLayer.writePage(p)
 }

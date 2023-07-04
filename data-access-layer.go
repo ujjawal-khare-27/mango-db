@@ -15,7 +15,7 @@ type page struct {
 type dataAccessLayer struct {
 	file     *os.File
 	pageSize int
-	freelist *freelist
+	*freelist
 }
 
 // function to create a new data access layer
