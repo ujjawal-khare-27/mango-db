@@ -1,3 +1,3 @@
-module example.com/m/v2
+module mango-db
 
 go 1.19
