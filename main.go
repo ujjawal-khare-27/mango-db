@@ -113,3 +113,16 @@ func (ds *DocumentStore) LoadFromFile(fileName string) error {
 
 	return nil
 }
+
+func main() {
+	// initialize db
+	dataAccessLayer, _ := newDataAccessLayer("db.db", os.Getpagesize())
+
+	// create a new page
+	p := dataAccessLayer.allocateEmptyPage()
+	p.num = dataAccessLayer.getNextPage()
+	copy(p.data[:], "data")
+
+	// commit it
+	_ = dataAccessLayer.writePage(p)
+}
