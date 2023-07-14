@@ -69,28 +69,3 @@ func (d *dataAccessLayer) writePage(p *page) error {
 	}
 	return nil
 }
-
-// Write meta page
-func (d *dataAccessLayer) writeMeta(meta *meta) (*page, error) {
-	p := d.allocateEmptyPage()
-	p.num = metaPageNum
-	meta.serialize(p.data)
-
-	err := d.writePage(p)
-	if err != nil {
-		return nil, err
-	}
-	return p, nil
-}
-
-// Read meta page
-func (d *dataAccessLayer) readMeta() (*meta, error) {
-	p, err := d.readPage(metaPageNum)
-	if err != nil {
-		return nil, err
-	}
-
-	meta := newEmptyMeta()
-	meta.deserialize(p.data)
-	return meta, nil
-}
